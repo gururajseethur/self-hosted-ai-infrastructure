@@ -1,8 +1,30 @@
 # AI Control Plane
 
-**One-click AI infrastructure. Deploy in minutes.**
+<p>
+<img src="https://img.shields.io/badge/license-MIT-blue.svg" alt="MIT" />
+<img src="https://img.shields.io/badge/docker--compose-ready-2496ED?logo=docker&logoColor=white" alt="docker" />
+<img src="https://img.shields.io/badge/proxy-Traefik%20%2B%20Cloudflare%20Tunnel-F05032" alt="proxy" />
+<img src="https://img.shields.io/badge/observability-Grafana%20%2B%20Prometheus-E6522C" alt="observability" />
+<img src="https://img.shields.io/badge/AI-Ollama%20local-success" alt="ollama" />
+</p>
 
-AI Control Plane is a fully managed, self-hosted platform for running and monitoring AI models. No technical knowledge required.
+**Self-hosted AI infrastructure that deploys in minutes.** One-command rollout of a production-grade local LLM platform with TLS, monitoring, and zero open ports — Cloudflare Tunnel routes everything, Traefik handles internal routing, Grafana watches it, Ollama serves it. Built for people who want their AI stack on their own metal without the YAML rabbit hole.
+
+```mermaid
+flowchart TB
+  U[User / API client] --> CF[Cloudflare Tunnel]
+  CF --> T[Traefik · TLS · Auth]
+  T --> G[Grafana :3000]
+  T --> P[Prometheus :9090]
+  T --> OP[Ollama Proxy :11435]
+  OP -->|instrumented forward| O[Ollama :11434]
+  OP --> EX[Ollama Exporter :9091]
+  P --> NE[Node Exporter]
+  P --> CA[cAdvisor]
+  P --> EX
+  G --> P
+```
+
 ---
 
 ## 📢 Latest Update: PHASE 3 ✅ Security & Admin Dashboard
