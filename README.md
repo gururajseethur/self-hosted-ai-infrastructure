@@ -1,4 +1,4 @@
-# � AI Control Plane
+# AI Control Plane
 
 **One-click AI infrastructure. Deploy in minutes.**
 
@@ -51,7 +51,7 @@ Want to understand the stack or customize it? This section is for you.
 ### 1. Clone & Configure
 
 ```bash
-git clone https://github.com/gururaj-seethur/gururajseethur-infra.git
+git clone https://github.com/gururajseethur/gururajseethur-infra.git
 cd gururajseethur-infra
 
 # Create .env from template
