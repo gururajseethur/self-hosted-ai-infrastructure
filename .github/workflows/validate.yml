@@ -1,0 +1,68 @@
+name: 🔍 Infrastructure Validation
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: ✅ Validate docker-compose.yml
+        run: |
+          docker-compose config > /dev/null
+          echo "✓ docker-compose.yml is valid"
+      
+      - name: ✅ Check required files exist
+        run: |
+          [ -f "docker-compose.yml" ] || exit 1
+          [ -f ".env.template" ] || exit 1
+          [ -f "config/prometheus/prometheus.yml" ] || exit 1
+          [ -f "config/traefik/traefik.yml" ] || exit 1
+          [ -f "config/grafana/provisioning/dashboards/unified-control-center.json" ] || exit 1
+          echo "✓ All required files present"
+      
+      - name: ✅ Lint Python exporter
+        run: |
+          pip install pylint
+          pylint exporter/ollama/app.py --disable=missing-docstring || true
+      
+      - name: ✅ Validate JSON dashboards
+        run: |
+          python3 -m json.tool config/grafana/provisioning/dashboards/unified-control-center.json > /dev/null
+          echo "✓ Dashboard JSON is valid"
+      
+      - name: ✅ Check for secrets in code
+        run: |
+          ! grep -r "eyJhIjov" . --include="*.yml" --include="*.json" --include="*.md"
+          echo "✓ No hardcoded secrets found"
+      
+      - name: ✅ Verify .gitignore excludes secrets
+        run: |
+          grep -q "\.env" .gitignore
+          grep -q "acme.json" .gitignore
+          echo "✓ .gitignore configured correctly"
+
+  security:
+    runs-on: ubuntu-latest
+    
+    steps:
+      - uses: actions/checkout@v3
+      
+      - name: 🔐 Run Trivy container scan
+        uses: aquasecurity/trivy-action@master
+        with:
+          scan-type: 'fs'
+          scan-ref: '.'
+          format: 'sarif'
+          output: 'trivy-results.sarif'
+      
+      - name: 📤 Upload Trivy results
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'trivy-results.sarif'

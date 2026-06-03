@@ -1,0 +1,22 @@
+http:
+  middlewares:
+    auth:
+      basicAuth:
+        users:
+          - "admin:$apr1$h6552PWJ$IgQniiPICtfaSVVVI4q4G1"  # admin:admin (CHANGE IN PRODUCTION)
+
+tls:
+  options:
+    default:
+      minVersion: VersionTLS12
+      cipherSuites:
+        - TLS_ECDHE_ECDSA_WITH_AES_128_GCM_SHA256
+        - TLS_ECDHE_RSA_WITH_AES_128_GCM_SHA256
+        - TLS_ECDHE_ECDSA_WITH_AES_256_GCM_SHA384
+
+      # Dynamic Traefik configuration is generated at deploy time from
+      # config/traefik/dynamic.yml.template by scripts/deploy.sh.
+      # Do not commit secrets into this file. If this file exists it will be
+      # used by Traefik; otherwise the deploy script will create it.
+
+      {}

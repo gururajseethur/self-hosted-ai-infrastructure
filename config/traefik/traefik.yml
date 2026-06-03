@@ -1,0 +1,51 @@
+api:
+  dashboard: false
+  debug: false
+
+entryPoints:
+  web:
+    address: :80
+    http:
+      redirections:
+        entrypoint:
+          scheme: https
+          permanent: true
+
+  websecure:
+    address: :443
+    asDefault: true
+
+providers:
+  docker:
+    endpoint: unix:///var/run/docker.sock
+    exposedByDefault: false
+    network: infra
+  
+  file:
+    filename: /etc/traefik/dynamic.yml
+    watch: true
+
+certificatesResolvers:
+  letsencrypt:
+    acme:
+      email: ${TRAEFIK_CERTIFICATESEMAIL}
+      storage: /acme.json
+      # NOTE: HTTP challenge is not compatible with Cloudflare Tunnel.
+      # Use DNS challenge (Cloudflare) or rely on Cloudflare edge certificates.
+      # For DNS challenge you can configure a cloudflare resolver here and
+      # set the appropriate ENV vars for the provider.
+      # Example (uncomment and configure):
+      # letsencrypt:
+      #   acme:
+      #     email: "your-email@gururajseethur.in"
+      #     storage: "/acme.json"
+      #     dnsChallenge:
+      #       provider: cloudflare
+      #       delayBeforeCheck: 0
+
+log:
+  level: INFO
+  format: json
+
+accessLog:
+  format: json

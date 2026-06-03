@@ -1,0 +1,226 @@
+version: '3.9'
+
+services:
+  # ============================================
+  # Traefik: Reverse Proxy + Label Routing
+  # ============================================
+  traefik:
+    image: traefik:v3.0
+    container_name: traefik
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    environment:
+      - TRAEFIK_API_INSECURE=false
+      - TRAEFIK_PROVIDERS_DOCKER=true
+      - TRAEFIK_PROVIDERS_DOCKER_EXPOSEDBYDEFAULT=false
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - ./config/traefik/traefik.yml:/traefik.yml:ro
+    labels:
+      - "traefik.enable=true"
+    networks:
+      - infra
+
+  # ============================================
+  # Cloudflared: Cloudflare Tunnel Agent
+  # ============================================
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    container_name: cloudflared
+    restart: unless-stopped
+    command: tunnel run
+    environment:
+      - TUNNEL_TOKEN=${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - traefik
+    networks:
+      - infra
+
+  # ============================================
+  # Ollama: AI Model Hosting
+  # ============================================
+  ollama:
+    image: ollama/ollama:latest
+    container_name: ollama
+    restart: unless-stopped
+    environment:
+      - OLLAMA_HOST=0.0.0.0:11434
+    volumes:
+      - ollama_data:/root/.ollama
+    expose:
+      - "11434"
+    networks:
+      - infra
+
+  # ============================================
+  # Ollama Proxy: Instrumentation & Metrics
+  # ============================================
+  ollama-proxy:
+    build:
+      context: ./exporter/ollama-proxy
+      dockerfile: Dockerfile
+    container_name: ollama-proxy
+    restart: unless-stopped
+    environment:
+      - OLLAMA_BACKEND_URL=http://ollama:11434
+      - EXPORTER_URL=http://ollama-exporter:9091
+      - PROXY_PORT=11435
+      - REQUEST_TIMEOUT=60
+    expose:
+      - "11435"
+    depends_on:
+      - ollama
+      - ollama-exporter
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.ollama-proxy.loadbalancer.server.port=11435"
+      - "traefik.http.routers.ollama-proxy.rule=Host(`ollama-proxy.${DOMAIN}`)"
+      - "traefik.http.routers.ollama-proxy.entrypoints=websecure"
+      - "traefik.http.routers.ollama-proxy.tls.certresolver=letsencrypt"
+      - "traefik.http.routers.ollama-proxy.middlewares=auth@file"
+    networks:
+      - infra
+
+  # ============================================
+  # Ollama Exporter: Prometheus Metrics
+  # ============================================
+  ollama-exporter:
+    build:
+      context: ./exporter/ollama
+      dockerfile: Dockerfile
+    container_name: ollama-exporter
+    restart: unless-stopped
+    environment:
+      - OLLAMA_API_URL=http://ollama:11434
+      - METRICS_PORT=9091
+    expose:
+      - "9091"
+    depends_on:
+      - ollama
+    networks:
+      - infra
+
+  # ============================================
+  # AI Control Plane: Customer-Facing Application
+  # ============================================
+  app:
+    build:
+      context: ./app
+      dockerfile: Dockerfile
+    container_name: ai-control-plane
+    restart: unless-stopped
+    environment:
+      - OLLAMA_PROXY_URL=http://ollama-proxy:11435
+      - PROMETHEUS_URL=http://prometheus:9090
+      - API_PORT=8000
+    expose:
+      - "8000"
+    depends_on:
+      - ollama-proxy
+      - prometheus
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.services.app.loadbalancer.server.port=8000"
+      - "traefik.http.routers.app.rule=Host(`app.${DOMAIN}`)"
+      - "traefik.http.routers.app.entrypoints=websecure"
+      - "traefik.http.routers.app.tls.certresolver=letsencrypt"
+    networks:
+      - infra
+
+  # ============================================
+  # Node Exporter: Host Metrics
+  # ============================================
+  node-exporter:
+    image: prom/node-exporter:latest
+    container_name: node-exporter
+    restart: unless-stopped
+    command:
+      - '--path.procfs=/host/proc'
+      - '--path.sysfs=/host/sys'
+      - '--path.rootfs=/rootfs'
+      - '--collector.filesystem.mount-points-exclude=^/(sys|proc|dev|host|etc)($$|/)'
+    volumes:
+      - /proc:/host/proc:ro
+      - /sys:/host/sys:ro
+      - /:/rootfs:ro
+    expose:
+      - "9100"
+    networks:
+      - infra
+
+  # ============================================
+  # cAdvisor: Container Metrics
+  # ============================================
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor:latest
+    container_name: cadvisor
+    restart: unless-stopped
+    volumes:
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+    expose:
+      - "8080"
+    networks:
+      - infra
+
+  # ============================================
+  # Prometheus: Metrics Collection & Storage
+  # (Internal only - accessed by app backend)
+  # ============================================
+  prometheus:
+    image: prom/prometheus:latest
+    container_name: prometheus
+    restart: unless-stopped
+    user: root
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yml'
+      - '--storage.tsdb.path=/prometheus'
+      - '--web.console.libraries=/usr/share/prometheus/console_libraries'
+      - '--web.console.templates=/usr/share/prometheus/consoles'
+      - '--storage.tsdb.retention.time=7d'
+    volumes:
+      - ./config/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml:ro
+      - prometheus_data:/prometheus
+    expose:
+      - "9090"
+    networks:
+      - infra
+
+  # ============================================
+  # Grafana: Dashboards & Alerting
+  # (Internal only - accessed via docker exec or SSH tunnel)
+  # ============================================
+  grafana:
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    environment:
+      - GF_SECURITY_ADMIN_USER=${GRAFANA_ADMIN_USER:-admin}
+      - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-changeme}
+      - GF_USERS_ALLOW_SIGN_UP=false
+      - GF_SERVER_DOMAIN=${DOMAIN}
+      - GF_SERVER_ROOT_URL=http://localhost:3000
+      - GF_INSTALL_PLUGINS=grafana-polystat-panel,grafana-clock-panel
+    volumes:
+      - grafana_data:/var/lib/grafana
+      - ./config/grafana/provisioning:/etc/grafana/provisioning:ro
+    expose:
+      - "3000"
+    depends_on:
+      - prometheus
+    networks:
+      - infra
+
+networks:
+  infra:
+    driver: bridge
+
+volumes:
+  prometheus_data:
+  grafana_data:
+  ollama_data:
+
+

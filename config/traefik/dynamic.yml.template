@@ -1,0 +1,13 @@
+# Traefik dynamic configuration template
+http:
+  middlewares:
+    internal-basic-auth:
+      basicAuth:
+        users:
+          - "__TRAEFIK_BASIC_AUTH_HASH__"
+
+tls:
+  options:
+    default:
+      minVersion: VersionTLS12
+      sniStrict: true

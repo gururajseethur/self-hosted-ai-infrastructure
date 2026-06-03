@@ -1,0 +1,42 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Docker volumes
+volumes/
+data/
+
+# Secrets
+*.key
+*.crt
+*.pem
+acme.json
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs
+logs/
+*.log
+
+# Build artifacts
+dist/
+build/
+*.o
+
+# Node (if needed)
+node_modules/
+package-lock.json
+
+# Temp
+tmp/
+temp/
