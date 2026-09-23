@@ -72,7 +72,7 @@ nslookup dashboard.gururajseethur.in
 
 ### 3.1 Create `.env` from Template
 ```bash
-cd gururajseethur-infra
+cd self-hosted-ai-infrastructure
 cp .env.template .env
 ```
 
