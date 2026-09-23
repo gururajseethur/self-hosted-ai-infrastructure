@@ -191,7 +191,7 @@ All of these are hidden behind the one app interface.
 ## Testing the Build (For You)
 
 ```bash
-cd /home/gururaj-seethur/Downloads/gururajseethur-infra
+cd /home/gururaj-seethur/Downloads/self-hosted-ai-infrastructure
 
 # Validate syntax
 python3 -m py_compile app/backend/main.py
