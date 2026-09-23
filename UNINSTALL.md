@@ -62,7 +62,7 @@ bash scripts/uninstall.sh
 
 ### Basic Uninstall (Interactive)
 ```bash
-cd /path/to/gururajseethur-infra
+cd /path/to/self-hosted-ai-infrastructure
 bash scripts/uninstall.sh
 ```
 
@@ -191,8 +191,8 @@ bash scripts/uninstall.sh
 cat .env.backup.* > .env.archive
 
 # Move repo to new server
-git clone https://github.com/your-org/gururajseethur-infra.git
-cd gururajseethur-infra
+git clone https://github.com/your-org/self-hosted-ai-infrastructure.git
+cd self-hosted-ai-infrastructure
 ```
 
 ### Scenario 3: Uninstall from Cron (Automated)
@@ -348,8 +348,8 @@ A: Run uninstall script—it only removes containers/volumes, not source code!
 
 3. **If moving servers:**
    ```bash
-   git clone https://github.com/your-org/gururajseethur-infra.git
-   cd gururajseethur-infra
+   git clone https://github.com/your-org/self-hosted-ai-infrastructure.git
+   cd self-hosted-ai-infrastructure
    bash install/install.sh
    ```
 
@@ -358,7 +358,7 @@ A: Run uninstall script—it only removes containers/volumes, not source code!
 ```bash
 # Remove repository entirely
 cd ..
-rm -rf gururajseethur-infra
+rm -rf self-hosted-ai-infrastructure
 
 # Clean up all Docker (careful!)
 docker system prune -a --volumes
