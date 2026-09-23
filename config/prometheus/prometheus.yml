@@ -2,7 +2,7 @@ global:
   scrape_interval: 15s
   evaluation_interval: 15s
   external_labels:
-    cluster: 'gururajseethur-infra'
+    cluster: 'self-hosted-ai-infrastructure'
     environment: 'production'
 
 alerting:
