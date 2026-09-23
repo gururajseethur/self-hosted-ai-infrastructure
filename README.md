@@ -575,7 +575,7 @@ docker-compose restart SERVICE_NAME
 ### Backups
 ```bash
 # Automated daily backups (add to crontab)
-0 2 * * * docker run --rm -v gururajseethur-infra_prometheus_data:/data \
+0 2 * * * docker run --rm -v self-hosted-ai-infrastructure_prometheus_data:/data \
   -v /backups:/backup alpine tar czf /backup/prom-$(date +%s).tar.gz -C /data .
 ```
 
