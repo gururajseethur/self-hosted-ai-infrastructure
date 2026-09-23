@@ -34,6 +34,12 @@ build/
 *.o
 
 # Node (if needed)
+
+# Python bytecode
+__pycache__/
+*.py[cod]
+*.pyo
+
 node_modules/
 package-lock.json
 
