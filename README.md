@@ -73,8 +73,8 @@ Want to understand the stack or customize it? This section is for you.
 ### 1. Clone & Configure
 
 ```bash
-git clone https://github.com/gururajseethur/gururajseethur-infra.git
-cd gururajseethur-infra
+git clone https://github.com/gururajseethur/self-hosted-ai-infrastructure.git
+cd self-hosted-ai-infrastructure
 
 # Create .env from template
 cp .env.template .env
@@ -269,7 +269,7 @@ git revert <commit-hash>
 
 ### Backup Prometheus Data
 ```bash
-docker run --rm -v gururajseethur-infra_prometheus_data:/data \
+docker run --rm -v self-hosted-ai-infrastructure_prometheus_data:/data \
   -v /backup:/backup \
   alpine tar czf /backup/prometheus-$(date +%Y%m%d).tar.gz -C /data .
 ```
@@ -478,7 +478,7 @@ This platform is designed for:
 ## 📁 Folder Structure
 
 ```
-gururajseethur-infra/
+self-hosted-ai-infrastructure/
 ├── docker-compose.yml           # Main orchestration
 ├── .env.template                # Config template (commit)
 ├── .env                          # Your config (don't commit)
