@@ -192,7 +192,7 @@ docker compose exec prometheus curl http://localhost:9090/api/v1/query?query=oll
 ## File Manifest
 
 ```
-gururajseethur-infra/
+self-hosted-ai-infrastructure/
 ├── exporter/
 │   ├── ollama/
 │   │   ├── app.py ......................... Enhanced exporter with /observe
