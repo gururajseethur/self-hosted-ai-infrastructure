@@ -7,7 +7,7 @@
 ## 📦 Project Delivered
 
 ```
-gururajseethur-infra/
+self-hosted-ai-infrastructure/
 ├── 📄 Documentation
 │   ├── README.md                          # Complete guide
 │   ├── QUICKSTART.md                      # 5-minute setup
