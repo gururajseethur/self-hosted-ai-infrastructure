@@ -8,7 +8,7 @@
 
 ### Check System Health (Morning)
 ```bash
-cd ~/gururajseethur-infra
+cd ~/self-hosted-ai-infrastructure
 ./scripts/status.sh
 ```
 
@@ -43,7 +43,7 @@ Actions: Send to your email/Slack
 
 ### Backup Prometheus Data
 ```bash
-docker run --rm -v gururajseethur-infra_prometheus_data:/data \
+docker run --rm -v self-hosted-ai-infrastructure_prometheus_data:/data \
   -v ~/backups:/backup \
   alpine tar czf /backup/prometheus-weekly-$(date +%Y%m%d).tar.gz -C /data .
 
@@ -74,7 +74,7 @@ docker system prune -a --volumes
 
 ### Update Base Images
 ```bash
-cd ~/gururajseethur-infra
+cd ~/self-hosted-ai-infrastructure
 
 # Pull latest versions
 docker-compose pull
@@ -349,13 +349,13 @@ tar xzf snapshot.tar.gz
 docker-compose down
 
 # 2. Remove old volume
-docker volume rm gururajseethur-infra_prometheus_data
+docker volume rm self-hosted-ai-infrastructure_prometheus_data
 
 # 3. Create new volume
-docker volume create gururajseethur-infra_prometheus_data
+docker volume create self-hosted-ai-infrastructure_prometheus_data
 
 # 4. Restore backup
-docker run --rm -v gururajseethur-infra_prometheus_data:/data \
+docker run --rm -v self-hosted-ai-infrastructure_prometheus_data:/data \
   -v ~/backups:/backup \
   alpine tar xzf /backup/prometheus-weekly-20260205.tar.gz -C /data
 
@@ -382,7 +382,7 @@ scp grafana.backup user@newserver:~/
 docker volume import prometheus_data prometheus.backup
 docker volume import grafana_data grafana.backup
 
-cd ~/gururajseethur-infra
+cd ~/self-hosted-ai-infrastructure
 cp .env.template .env
 # Edit .env with new config
 ./scripts/deploy.sh
