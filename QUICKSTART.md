@@ -33,8 +33,8 @@ sudo usermod -aG docker $USER  # Run Docker without sudo
 
 ```bash
 # Clone this repo
-git clone https://github.com/gururaj-seethur/gururajseethur-infra.git
-cd gururajseethur-infra
+git clone https://github.com/gururajseethur/self-hosted-ai-infrastructure.git
+cd self-hosted-ai-infrastructure
 
 # Create .env file
 cp .env.template .env
