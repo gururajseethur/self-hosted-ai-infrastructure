@@ -132,8 +132,8 @@ Same process:
 ssh user@your-server.com
 
 # Clone the repo
-git clone https://github.com/gururaj-seethur/gururajseethur-infra.git
-cd gururajseethur-infra
+git clone https://github.com/gururajseethur/self-hosted-ai-infrastructure.git
+cd self-hosted-ai-infrastructure
 
 # Run installer
 bash install/install.sh
@@ -228,7 +228,7 @@ Edit frontend at `app/frontend/index.html`
 
 Community contributions welcome:
 ```bash
-git fork https://github.com/gururaj-seethur/gururajseethur-infra.git
+git fork https://github.com/gururajseethur/self-hosted-ai-infrastructure.git
 git checkout -b feature/your-feature
 git commit -am "Add feature"
 git push origin feature/your-feature
