@@ -167,8 +167,8 @@ Admin Dashboard ──── http://localhost:3000 [SSH Tunnel]
 
 ```bash
 # 1. Clone repository
-git clone https://github.com/gururaj-seethur/gururajseethur-infra.git
-cd gururajseethur-infra
+git clone https://github.com/gururajseethur/self-hosted-ai-infrastructure.git
+cd self-hosted-ai-infrastructure
 
 # 2. Run installer
 bash install/install.sh
@@ -194,7 +194,7 @@ bash install/install.sh
 ## Documentation Structure
 
 ```
-gururajseethur-infra/
+self-hosted-ai-infrastructure/
 ├── PRODUCT.md              ← For customers (features, pricing, use cases)
 ├── README.md               ← Main overview (dual-audience)
 │
